@@ -34,15 +34,20 @@ else:
                     response = openai.Completion.create(
                         engine="text-davinci-003",
                         prompt=f"Translate the following {source_lang} text to {target_lang}: '{user_input}'",
-                        max_tokens=50
+                        max_tokens=200
                     )
-                    translation = response.choices[0].text.strip()
-                    st.write(f"**Source ({source_lang}):** {user_input}")
-                    st.write(f"**Translation ({target_lang}):** {translation}")
-                except Exception as e:
-                    st.error("An error occurred during translation. Please try again.")
+                    if 'choices' in response and response.choices:
+                        translation = response.choices[0].text.strip()
+                        st.write(f"**Source ({source_lang}):** {user_input}")
+                        st.write(f"**Translation ({target_lang}):** {translation}")
+                        st.success("Translation successful!")
+                        st.balloons()
+                    else:
+                        st.error("Translation failed. Please check your input and try again.")
+                except openai.error.OpenAIError as e:
+                    st.error(f"OpenAI Error: {e}")
     except Exception as e:
         st.error("An error occurred. Please check your OpenAI API key and try again.")
 
-# Display information
+# Display information in the sidebar
 st.sidebar.markdown("Powered by OpenAI API")
