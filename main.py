@@ -5,29 +5,30 @@ import openai
 st.set_page_config(page_title="text translate")
 
 # Streamlit UI
-st.title("AI Text Translator Chat")
+st.title(" AI Text Translator Chat")
 
 # Sidebar for API key input
-st.sidebar.title("OpenAI API Key")
-api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password")
-
-# Check if API key is provided
-if not api_key:
-    st.warning("Please provide your OpenAI API key in the sidebar to use the translation feature.")
-else:
-    try:
-        # Set OpenAI API key
-        openai.api_key = api_key
+with st.sidebar:
+    st.title('💬 OpenAI Translator..')
+    if 'OPENAI_API_KEY' in st.secrets:
+        st.success('API key already provided!', icon='✅')
+        openai.api_key = st.secrets['OPENAI_API_KEY']
+    else:
+        openai.api_key = st.text_input('Enter OpenAI API token:', type='password')
+        if not (openai.api_key.startswith('sk-') and len(openai.api_key)==51):
+            st.warning('Please enter your credentials!', icon='⚠️')
+        else:
+            st.success('API key set successfully!', icon='👍')
 
         # Text input
-        user_input = st.text_input("Enter text to translate:")
+user_input = st.text_input("Enter text to translate:")
 
         # Language selection
-        source_lang = st.selectbox("Select source language:", ["en"])
-        target_lang = st.selectbox("Select target language:", ["es", "fr", "de", "ja", "zh", "ru"])
+source_lang = st.selectbox("Select source language:", ["en"])
+target_lang = st.selectbox("Select target language:", ["es", "fr", "de", "ja", "zh", "ru"])
 
         # Translate button
-        if st.button("Translate"):
+if st.button("Translate"):
             if user_input:
                 try:
                     # Perform translation using OpenAI
@@ -46,8 +47,8 @@ else:
                         st.error("Translation failed. Please check your input and try again.")
                 except openai.error.OpenAIError as e:
                     st.error(f"OpenAI Error: {e}")
-    except Exception as e:
-        st.error("An error occurred. Please check your OpenAI API key and try again.")
+                except Exception as e:
+                   st.error("An error occurred. Please check your OpenAI API key and try again.")
 
 # Display information in the sidebar
 st.sidebar.markdown("Powered by OpenAI API")
